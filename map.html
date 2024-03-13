@@ -94,7 +94,15 @@
                             let site = ctrlTech.url || 'aucun site associé';
                             var popup = L.popup()
                                 .setLatLng([ctrlTech.latitude, ctrlTech.longitude])
-                                .setContent(`<p>Garage : ${ctrlTech.cct_denomination}<br /> Adress : ${ctrlTech.cct_adresse}, ${ctrlTech.cct_code_commune} ${ctrlTech.cct_code_postal} <br/> Site Web : ${site} <br/> Type Véhicule controllé : ${ctrlTech.cat_vehicule_libelle} <br/> prix visite : ${ctrlTech.prix_visite}€ prix <br/> prix Contre Visite : min : ${ctrlTech.prix_contre_visite_min}€ max : ${ctrlTech.prix_contre_visite_max}€  <p>`)
+                                .setContent(`
+                                                <div class="popup-content">
+                                                    <h2>${ctrlTech.cct_denomination}</h2>
+                                                    <p><strong>Adresse:</strong> ${ctrlTech.cct_adresse}, ${ctrlTech.cct_code_commune} ${ctrlTech.cct_code_postal}</p>
+                                                    <p><strong>Site Web:</strong> ${site}</p>
+                                                    <p><strong>Type Véhicule contrôlé:</strong> ${ctrlTech.cat_vehicule_libelle}</p>
+                                                    <p><strong>Prix visite:</strong> ${ctrlTech.prix_visite}€</p>
+                                                    <p><strong>Prix Contre Visite:</strong> min: ${ctrlTech.prix_contre_visite_min}€ - max: ${ctrlTech.prix_contre_visite_max}€</p>
+                                                    </div> `)
                                 .openOn(map);
                         });
                     }
