@@ -61,7 +61,7 @@
         function newMarker(lat, lon) {
             let xhr = new XMLHttpRequest();
             console.log(`${lon} ${lat}`)
-            let url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/controle_techn/records?where=within_distance(coordgeo%2C%20geom%27POINT(${lon}%20${lat})%27%2C%2010km)&order_by=prix_visite&limit=50`;
+            let url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/controle_techn/records?where=within_distance(coordgeo%2C%20geom%27POINT(${lon}%20${lat})%27%2C%2010km)&order_by=prix_visite&limit=1`;
             xhr.open('GET', url);
             xhr.responseType = 'json';
             xhr.send();
