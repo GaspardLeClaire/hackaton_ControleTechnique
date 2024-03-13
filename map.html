@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="map.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let markers = [];
+
+        addEventListener("load", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+                    map = L.map('map').setView([latitude, longitude], 13);
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
+
+                    map.on('zoomend', function () {
+                        const { lat, lng } = map.getCenter();
+                        updateMarkers(lat, lng);
+                    });
+
+                    map.on('click', function (e) {
+                        const latlng = e.latlng;
+                        const latitude = latlng.lat;
+                        const longitude = latlng.lng;
+                        updateMarkers(latitude, longitude);
+                    });
+
+                    updateMarkers(latitude, longitude);
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+            }
+        });
+
+        function updateMarkers(latitude, longitude) {
+            clearMarkers();
+            newMarker(latitude, longitude);
+        }
+
+        function newMarker(lat, lon) {
+            let xhr = new XMLHttpRequest();
+            console.log(`${lon} ${lat}`)
+            let url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/controle_techn/records?where=within_distance(coordgeo%2C%20geom%27POINT(${lon}%20${lat})%27%2C%2010km)&order_by=prix_visite&limit=50`;
+            xhr.open('GET', url);
+            xhr.responseType = 'json';
+            xhr.send();
+            xhr.onload = function () {
+                let result = xhr.response.results;
+                if (result.length > 0) {
+                    let listCtrlTech = []; // liste des garages unique
+                    let listCtrlTechName = []; // liste contenant seulement les noms des garages pour savoir si le garage est déjà ajouté dans ' listCtrlTech '
+                    listCtrlTech.push(result[0]);
+                    listCtrlTechName.push(result[0].cct_denomination);
+
+                    for (let a = 0; a < listCtrlTech.length; a++) {
+                        let ctrlTechExistant = listCtrlTech[a];
+                        for (let b = 0; b < result.length; b++) {
+                            let ctrlTech = result[b];
+                            if (listCtrlTechName.includes(ctrlTech.cct_denomination) === false) {
+                                console.log(ctrlTech.cct_denomination);
+                                listCtrlTech.push(ctrlTech);
+                            }
+                        }
+                    }
+
+                    console.log(listCtrlTech)
+
+                    for (let i = 0; i < listCtrlTech.length; i++) {
+                        let ctrlTech = listCtrlTech[i];
+                        var marker = L.marker([ctrlTech.latitude, ctrlTech.longitude]).addTo(map);
+                        markers.push(marker);
+                        marker.on('click', function () {
+                            let site = ctrlTech.url || 'aucun site associé';
+                            var popup = L.popup()
+                                .setLatLng([ctrlTech.latitude, ctrlTech.longitude])
+                                .setContent(`<p>Garage : ${ctrlTech.cct_denomination}<br /> Adress : ${ctrlTech.cct_adresse}, ${ctrlTech.cct_code_commune} ${ctrlTech.cct_code_postal} <br/> Site Web : ${site} <br/> Type Véhicule controllé : ${ctrlTech.cat_vehicule_libelle} <br/> prix visite : ${ctrlTech.prix_visite}€ prix <br/> prix Contre Visite : min : ${ctrlTech.prix_contre_visite_min}€ max : ${ctrlTech.prix_contre_visite_max}€  <p>`)
+                                .openOn(map);
+                        });
+                    }
+                }
+
+            };
+        }
+
+        function clearMarkers() {
+            for (let i = 0; i < markers.length; i++) {
+                map.removeLayer(markers[i]);
+            }
+            markers = [];
+        }
+    </script>
+</body>
+
+</html>
