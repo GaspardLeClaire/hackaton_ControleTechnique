@@ -1,66 +1,25 @@
-# Titre du projet
-_(juste en dessous des badges sympatiques à placer)_
+# VSIO
 
-[![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)  [![forthebadge](http://forthebadge.com/images/badges/powered-by-electricity.svg)](http://forthebadge.com)
-
-Une petite description du projet
+VSIO est une application web permettant d'afficher sur une carte  les centres de controle technique proche de vous.
 
 ## Pour commencer
 
-Entrez ici les instructions pour bien débuter avec votre projet...
+VSIO avait pour but d'être une application mobile développée en Flutter mais par manque de connaissances en Flutter et un manque de temps. 
+J'ai préféré développer en html et javascript pour récupérer le temps perdu.
 
 ### Pré-requis
 
-Ce qu'il est requis pour commencer avec votre projet...
-
-- Programme 1
-- Programme 2
-- etc...
-
-### Installation
-
-Les étapes pour installer votre programme....
-
-Dites ce qu'il faut faire...
-
-_exemple_: Executez la commande ``telnet mapscii.me`` pour commencer ensuite [...]
-
-
-Ensuite vous pouvez montrer ce que vous obtenez au final...
+Télécharger le dossier en zip 
 
 ## Démarrage
 
-Dites comment faire pour lancer votre projet
+Pour lancer l'application il suffit d'ouvrir le fichier 'map.html' avec le navigateur web que vous souhaitez.
 
 ## Fabriqué avec
 
-Entrez les programmes/logiciels/ressources que vous avez utilisé pour développer votre projet
-
-_exemples :_
-* [Materialize.css](http://materializecss.com) - Framework CSS (front-end)
-* [Atom](https://atom.io/) - Editeur de textes
-
-## Contributing
-
-Si vous souhaitez contribuer, lisez le fichier [CONTRIBUTING.md](https://example.org) pour savoir comment le faire.
-
-## Versions
-Listez les versions ici 
-_exemple :_
-**Dernière version stable :** 5.0
-**Dernière version :** 5.1
-Liste des versions : [Cliquer pour afficher](https://github.com/your/project-name/tags)
-_(pour le lien mettez simplement l'URL de votre projets suivi de ``/tags``)_
+* [leafletjs]([http://materializecss.com](https://leafletjs.com/)) - Librairy Javascript (map)
+* [Data economie gouv](https://data.economie.gouv.fr/explore/dataset/controle_techn/information/?disjunctive.cct_code_dept&disjunctive.cat_vehicule_libelle&disjunctive.cat_energie_libelle&sort=prix_visite) - API (liste des centres controle techniques en France)
 
 ## Auteurs
-Listez le(s) auteur(s) du projet ici !
-* **Jhon doe** _alias_ [@outout14](https://github.com/outout14)
-
-Lisez la liste des [contributeurs](https://github.com/your/project/contributors) pour voir qui à aidé au projet !
-
-_(pour le lien mettez simplement l'URL de votre projet suivi de ``/contirubors``)_
-
-## License
-
-Ce projet est sous licence ``exemple: WTFTPL`` - voir le fichier [LICENSE.md](LICENSE.md) pour plus d'informations
+* **Gaspard Le Claire** _alias_ [@gaspardleclaire](https://github.com/outout14](https://github.com/GaspardLeClaire)
 
