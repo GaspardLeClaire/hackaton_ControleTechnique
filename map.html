@@ -61,26 +61,28 @@
         function newMarker(lat, lon) {
             let xhr = new XMLHttpRequest();
             console.log(`${lon} ${lat}`)
-            let url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/controle_techn/records?where=within_distance(coordgeo%2C%20geom%27POINT(${lon}%20${lat})%27%2C%2010km)&order_by=prix_visite&limit=1`;
+            let rayon = 10 * Math.pow(2, 13 - map.getZoom()); //Calculer le rayon nécessaire pour obtenir les garages dans un rayon désiré. Ici, le rayon est égal à 10 km lorsque le niveau de zoom est de 13.
+            console.log(rayon);
+            let url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/controle_techn/records?where=within_distance(coordgeo%2C%20geom%27POINT(${lon}%20${lat})%27%2C%20${rayon}km)&order_by=prix_visite&limit=10`;
             xhr.open('GET', url);
             xhr.responseType = 'json';
             xhr.send();
             xhr.onload = function () {
                 let result = xhr.response.results;
                 if (result.length > 0) {
-                    let listCtrlTech = []; // liste des garages unique
-                    let listCtrlTechName = []; // liste contenant seulement les noms des garages pour savoir si le garage est déjà ajouté dans ' listCtrlTech '
-                    listCtrlTech.push(result[0]);
-                    listCtrlTechName.push(result[0].cct_denomination);
+                    let listCtrlTech = []; // liste des garages uniques
+                    let setCtrlTechNames = new Set(); // ensemble contenant les noms des garages pour vérifier les doublons
 
-                    for (let a = 0; a < listCtrlTech.length; a++) {
-                        let ctrlTechExistant = listCtrlTech[a];
-                        for (let b = 0; b < result.length; b++) {
-                            let ctrlTech = result[b];
-                            if (listCtrlTechName.includes(ctrlTech.cct_denomination) === false) {
-                                console.log(ctrlTech.cct_denomination);
-                                listCtrlTech.push(ctrlTech);
-                            }
+                    for (let i = 0; i < result.length; i++) {
+                        let ctrlTech = result[i];
+                        // Vérifie si le nom du garage n'est pas déjà dans l'ensemble
+                        if (!setCtrlTechNames.has(ctrlTech.cct_denomination)) {
+                            // Si le nom n'est pas dans l'ensemble, ajoutez-le à la liste et à l'ensemble
+                            listCtrlTech.push(ctrlTech);
+                            setCtrlTechNames.add(ctrlTech.cct_denomination);
+                        }
+                        else{
+                            listCtrlTech[listCtrlTech.length - 1].cat_vehicule_libelle += `, ${ctrlTech.cat_vehicule_libelle}`;
                         }
                     }
 
