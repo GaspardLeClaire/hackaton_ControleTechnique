@@ -15,10 +15,7 @@
 </head>
 
 <body>
-    <div id="map">
-        <button>Top 10</button>
-    </div>
-
+    <div id="map"></div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
         let map;
@@ -60,62 +57,58 @@
             let rayon = 10 * Math.pow(2, 13 - map.getZoom()); //Calculer le rayon nécessaire pour obtenir les garages dans un rayon désiré. Ici, le rayon est égal à 10 km lorsque le niveau de zoom est de 13.
 
             let url = `https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/controle_techn/records?where=within_distance(coordgeo%2C%20geom%27POINT(${lon}%20${lat})%27%2C%20${rayon}km)&order_by=prix_visite&limit=50`;
-
+            console.log(url)
             xhr.open('GET', url);
             xhr.responseType = 'json';
             xhr.send();
             xhr.onload = function () {
                 let result = xhr.response.results;
                 if (result.length > 0) {
-                    let listCtrlTech = []; // liste des garages uniques
-                    let setCtrlTechNames = new Set(); // ensemble contenant les noms des garages pour vérifier les doublons
-                    let setCatVehiculeName = new Set();
+
+                    let listCtrlTech = []; // dictionnaire des garages uniques
                     for (let i = 0; i < result.length; i++) {
-                        console.log(setCatVehiculeName);
                         let ctrlTech = result[i];
-
-                        if (!setCtrlTechNames.has(ctrlTech.cct_denomination)) { // Vérifie si le nom du garage n'est pas déjà dans l'ensemble. Si le nom n'est pas dans l'ensemble, on l'ajoute à la liste et à l'ensemble
-
-                            listCtrlTech.push(ctrlTech);
-                            setCtrlTechNames.add(ctrlTech.cct_denomination);
-                            setCatVehiculeName = new Set(); // reinitialisation du set pour un nouveau centre
+                        let site = ctrlTech.cct_url;
+                        if (site === undefined) {
+                            site = 'aucun site associé';
+                        }
+                        if (!listCtrlTech[ctrlTech.cct_denomination]) {
+                            listCtrlTech[ctrlTech.cct_denomination] = {
+                                cct_denomination: ctrlTech.cct_denomination,
+                                cct_adresse: ctrlTech.cct_adresse,
+                                cct_code_commune: ctrlTech.cct_code_commune,
+                                code_postal: ctrlTech.code_postal,
+                                site: site,
+                                cat_vehicule_libelle: new Set(),
+                                prix_visite: ctrlTech.prix_visite,
+                                prix_contre_visite_min: ctrlTech.prix_contre_visite_min,
+                                prix_contre_visite_max: ctrlTech.prix_contre_visite_max,
+                                lati: ctrlTech.latitude,
+                                longi: ctrlTech.longitude
+                            }
                         }
                         else {
-                            console.log(ctrlTech.cat_vehicule_libelle)
-                            if (!setCatVehiculeName.has(ctrlTech.cat_vehicule_libelle)) { // verifie si le libelle de la categorie du vehicule n'est pas dans l'ensemble. Si oui on l'ajoute à la l'ensemble
-                                setCatVehiculeName.add(ctrlTech.cat_vehicule_libelle);
-                                listCtrlTech[listCtrlTech.length - 1].cat_vehicule_libelle += `, ${ctrlTech.cat_vehicule_libelle}` // liste des nom de vehicules sous forme de chaine de caractère
-                            }
+                            listCtrlTech[ctrlTech.cct_denomination].cat_vehicule_libelle.add(ctrlTech.cat_vehicule_libelle)
                         }
                     }
 
-                    console.log(listCtrlTech)
-
-                    for (let i = 0; i < listCtrlTech.length; i++) {
-                        let ctrlTech = listCtrlTech[i];
-                        var marker = L.marker([ctrlTech.latitude, ctrlTech.longitude]).addTo(map);
+                    for (let key in listCtrlTech) {
+                        let ctrlTechnique = listCtrlTech[key];
+                        var marker = L.marker([ctrlTechnique.lati, ctrlTechnique.longi]).addTo(map);
                         markers.push(marker);
-                        marker.on('click', function () { // affichage des informations du centre au moment du click sur le marker
-                            let site = ctrlTech.cct_url;
-                            if (site === undefined) {
-                                site = 'aucun site associé';
-                            }
-
-                            var popup = L.popup()
-                                .setLatLng([ctrlTech.latitude, ctrlTech.longitude])
-                                // content html du popup
-                                .setContent(` 
+                        marker.bindPopup(` 
                                                 <div>
-                                                    <h2>${ctrlTech.cct_denomination}</h2>
-                                                    <p><strong>Adresse:</strong> ${ctrlTech.cct_adresse}, ${ctrlTech.cct_code_commune} ${ctrlTech.code_postal}</p>
-                                                    <p><strong>Site Web:</strong> ${site}</p>
-                                                    <p><strong>Type Véhicule contrôlé:</strong> ${ctrlTech.cat_vehicule_libelle}</p>
-                                                    <p><strong>Prix visite:</strong> ${ctrlTech.prix_visite}€</p>
-                                                    <p><strong>Prix Contre Visite:</strong> min: ${ctrlTech.prix_contre_visite_min}€ - max: ${ctrlTech.prix_contre_visite_max}€</p>
-                                                </div> `)
-                                .openOn(map);
-                        });
+                                                    <h2>${ctrlTechnique.cct_denomination}</h2>
+                                                    <p><strong>Adresse:</strong> ${ctrlTechnique.cct_adresse}, ${ctrlTechnique.cct_code_commune} ${ctrlTechnique.code_postal}</p>
+                                                    <p><strong>Site Web:</strong> ${ctrlTechnique.site}</p>
+                                                    <p><strong>Type Véhicule contrôlé:</strong> ${Array.from(ctrlTechnique.cat_vehicule_libelle).join(', ')}</p>
+                                                    <p><strong>Prix visite:</strong> ${ctrlTechnique.prix_visite}€</p>
+                                                    <p><strong>Prix Contre Visite:</strong> min: ${ctrlTechnique.prix_contre_visite_min}€ - max: ${ctrlTechnique.prix_contre_visite_max}€</p>
+                                                </div> `);
+
                     }
+
+
                 }
 
             };
