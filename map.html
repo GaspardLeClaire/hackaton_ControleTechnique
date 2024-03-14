@@ -11,7 +11,7 @@
     <script src="map.js"></script>
     <link rel="stylesheet" href="style.css">
 
-    <title>Document</title>
+    <title>Map - Controle Technique</title>
 </head>
 
 <body>
@@ -72,17 +72,33 @@
                 if (result.length > 0) {
                     let listCtrlTech = []; // liste des garages uniques
                     let setCtrlTechNames = new Set(); // ensemble contenant les noms des garages pour vérifier les doublons
-
+                    let setCatVehiculeName = new Set();
                     for (let i = 0; i < result.length; i++) {
+                        console.log(setCatVehiculeName);
                         let ctrlTech = result[i];
-                        // Vérifie si le nom du garage n'est pas déjà dans l'ensemble
-                        if (!setCtrlTechNames.has(ctrlTech.cct_denomination)) {
-                            // Si le nom n'est pas dans l'ensemble, ajoutez-le à la liste et à l'ensemble
+
+                        if (setCatVehiculeName.length === 0) {
+                            setCatVehiculeName.add(ctrlTech.cat_vehicule_libelle);
+                        }
+
+                        if (!setCtrlTechNames.has(ctrlTech.cct_denomination)) { // Vérifie si le nom du garage n'est pas déjà dans l'ensemble. Si le nom n'est pas dans l'ensemble, on l'ajoute à la liste et à l'ensemble
+
                             listCtrlTech.push(ctrlTech);
                             setCtrlTechNames.add(ctrlTech.cct_denomination);
+                            setCatVehiculeName = new Set();
                         }
-                        else{
-                            listCtrlTech[listCtrlTech.length - 1].cat_vehicule_libelle += `, ${ctrlTech.cat_vehicule_libelle}`;
+                        else {
+                            console.log(ctrlTech.cat_vehicule_libelle)
+                            if (!setCatVehiculeName.has(ctrlTech.cat_vehicule_libelle)) { // verifie si le libelle de la categorie du vehicule n'est pas dans l'ensemble. Si oui on l'ajoute à la l'ensemble
+                                setCatVehiculeName.add(ctrlTech.cat_vehicule_libelle);
+                                console.log(setCtrlTechNames.indexOf(ctrlTech.cct_denomination));
+                                
+                                ctrlTech.setCatVehiculeName = setCatVehiculeName;
+                                console.log(ctrlTech);
+                                let stringSetCatVehicule = Array.from(ctrlTech.setCatVehiculeName).join(', ')
+                                ctrlTech.stringSetCatVehicule = stringSetCatVehicule;
+
+                            }
                         }
                     }
 
@@ -90,18 +106,20 @@
 
                     for (let i = 0; i < listCtrlTech.length; i++) {
                         let ctrlTech = listCtrlTech[i];
+
+                        console.log(ctrlTech.stringSetCatVehicule)
                         var marker = L.marker([ctrlTech.latitude, ctrlTech.longitude]).addTo(map);
                         markers.push(marker);
                         marker.on('click', function () {
-                            let site = ctrlTech.url || 'aucun site associé';
+                            let site = ctrlTech.cct_url || 'aucun site associé';
                             var popup = L.popup()
                                 .setLatLng([ctrlTech.latitude, ctrlTech.longitude])
                                 .setContent(`
                                                 <div class="popup-content">
                                                     <h2>${ctrlTech.cct_denomination}</h2>
-                                                    <p><strong>Adresse:</strong> ${ctrlTech.cct_adresse}, ${ctrlTech.cct_code_commune} ${ctrlTech.cct_code_postal}</p>
+                                                    <p><strong>Adresse:</strong> ${ctrlTech.cct_adresse}, ${ctrlTech.cct_code_commune} ${ctrlTech.code_postal}</p>
                                                     <p><strong>Site Web:</strong> ${site}</p>
-                                                    <p><strong>Type Véhicule contrôlé:</strong> ${ctrlTech.cat_vehicule_libelle}</p>
+                                                    <p><strong>Type Véhicule contrôlé:</strong> ${ctrlTech.stringSetCatVehicule}</p>
                                                     <p><strong>Prix visite:</strong> ${ctrlTech.prix_visite}€</p>
                                                     <p><strong>Prix Contre Visite:</strong> min: ${ctrlTech.prix_contre_visite_min}€ - max: ${ctrlTech.prix_contre_visite_max}€</p>
                                                     </div> `)
