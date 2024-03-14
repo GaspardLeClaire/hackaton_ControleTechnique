@@ -69,7 +69,7 @@
                     for (let i = 0; i < result.length; i++) {
                         let ctrlTech = result[i];
                         let site = ctrlTech.cct_url;
-                        if (site === undefined) {
+                        if (site === undefined || site === null) {
                             site = 'aucun site associé';
                         }
                         if (!listCtrlTech[ctrlTech.cct_denomination]) {
