@@ -17,7 +17,7 @@ Pour lancer l'application il suffit d'ouvrir le fichier 'map.html' avec le navig
 
 ## Fabriqué avec
 
-* [leafletjs]([http://materializecss.com](https://leafletjs.com/)) - Librairy Javascript (map)
+* [leafletjs](https://leafletjs.com/) - Librairy Javascript (map)
 * [Data economie gouv](https://data.economie.gouv.fr/explore/dataset/controle_techn/information/?disjunctive.cct_code_dept&disjunctive.cat_vehicule_libelle&disjunctive.cat_energie_libelle&sort=prix_visite) - API (liste des centres controle techniques en France)
 
 ## Auteurs
